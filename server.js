@@ -28,11 +28,9 @@ console.log("OPENAI_KEY:", OPENAI_KEY ? "OK" : "NON DEFINI");
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
-  if (!message) {
-    return res.status(400).json({ error: "Le message est requis." });
-  }
-
   try {
+    console.log("Message reçu:", message);
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -47,19 +45,23 @@ app.post("/chat", async (req, res) => {
     });
 
     const data = await response.json();
+    console.log("Réponse OpenAI:", data);
 
     if (data.error) {
+      // Si OpenAI renvoie une erreur
       return res.status(500).json({ error: data.error.message });
     }
 
     res.json({ reply: data.choices[0].message.content });
   } catch (err) {
-    console.error(err);
+    console.error("Erreur serveur:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
+
 // Render fournit le port via process.env.PORT
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Backend démarré sur le port ${PORT}`));
+
 
