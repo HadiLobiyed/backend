@@ -17,7 +17,7 @@ const limiter = rateLimit({
 });
 app.use("/chat", limiter);
 
-const OPENAI_KEY = "TA_CLE_API_SECURISEE";
+const OPENAI_KEY = "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";
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
@@ -43,3 +43,4 @@ app.post("/chat", async (req, res) => {
 });
 
 app.listen(3000, () => console.log("Backend démarré sur le port 3000"));
+
