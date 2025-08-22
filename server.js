@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
@@ -7,6 +6,9 @@ import rateLimit from "express-rate-limit";
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Faire confiance au proxy Render
+app.set("trust proxy", 1); // <-- cette ligne est essentielle
 
 // Limiter pour éviter les 429
 const limiter = rateLimit({
