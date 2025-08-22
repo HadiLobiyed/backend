@@ -46,7 +46,7 @@ app.post("/chat", async (req, res) => {
         "Authorization": `Bearer ${OPENAI_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: "gpt-5-mini",
         messages: [{ role: "user", content: message }],
         max_tokens: 200,
       }),
@@ -77,3 +77,4 @@ app.post("/chat", async (req, res) => {
 // Render fournit le port via process.env.PORT
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Backend démarré sur le port ${PORT}`));
+
