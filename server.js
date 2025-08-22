@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
@@ -8,17 +7,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ⚡️ Trust proxy pour express-rate-limit derrière un proxy (comme Render)
+app.set('trust proxy', 1);
+
 // Rate limiter : 1 requête toutes les 3 secondes par IP
 const limiter = rateLimit({
   windowMs: 3000, // 3 secondes
-  max: 1, 
-  standardHeaders: true, 
+  max: 1,
+  standardHeaders: true,
   legacyHeaders: false,
 });
 app.use("/chat", limiter);
 
 // Récupère la clé OpenAI depuis les variables d'environnement
-const OPENAI_KEY = process.env.OPENAI_KEY;
+const OPENAI_KEY = process.env.OPENAI_KEY?.trim(); // on retire espaces ou retours à la ligne
 
 if (!OPENAI_KEY) {
   console.error("❌ Veuillez définir la variable d'environnement OPENAI_KEY !");
@@ -28,6 +30,11 @@ console.log("OPENAI_KEY:", OPENAI_KEY ? "OK" : "NON DEFINI");
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
+
+  if (!message || typeof message !== "string") {
+    return res.status(400).json({ error: "Message invalide" });
+  }
+
   try {
     console.log("Message reçu:", message);
 
@@ -48,7 +55,6 @@ app.post("/chat", async (req, res) => {
     console.log("Réponse OpenAI:", data);
 
     if (data.error) {
-      // Si OpenAI renvoie une erreur
       return res.status(500).json({ error: data.error.message });
     }
 
@@ -59,9 +65,6 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-
 // Render fournit le port via process.env.PORT
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Backend démarré sur le port ${PORT}`));
-
-
