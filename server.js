@@ -24,6 +24,7 @@ if (!OPENAI_KEY) {
   console.error("❌ Veuillez définir la variable d'environnement OPENAI_KEY !");
   process.exit(1);
 }
+console.log("OPENAI_KEY:", OPENAI_KEY ? "OK" : "NON DEFINI");
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
@@ -61,3 +62,4 @@ app.post("/chat", async (req, res) => {
 // Render fournit le port via process.env.PORT
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Backend démarré sur le port ${PORT}`));
+
