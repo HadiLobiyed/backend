@@ -20,14 +20,15 @@ const limiter = rateLimit({
 app.use("/chat", limiter);
 
 // Récupère la clé OpenAI depuis les variables d'environnement
-const OPENAI_KEY = process.env.OPENAI_KEY?.trim(); // on retire espaces ou retours à la ligne
+const OPENAI_KEY = process.env.OPENAI_KEY?.trim();
 
 if (!OPENAI_KEY) {
   console.error("❌ Veuillez définir la variable d'environnement OPENAI_KEY !");
   process.exit(1);
 }
-console.log("OPENAI_KEY:", OPENAI_KEY ? "OK" : "NON DEFINI");
+console.log("OPENAI_KEY détectée: OK");
 
+// POST /chat
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
 
@@ -36,7 +37,7 @@ app.post("/chat", async (req, res) => {
   }
 
   try {
-    console.log("Message reçu:", message);
+    console.log("📩 Message reçu:", message);
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -52,15 +53,23 @@ app.post("/chat", async (req, res) => {
     });
 
     const data = await response.json();
-    console.log("Réponse OpenAI:", data);
+    console.log("🤖 Réponse OpenAI brute:", JSON.stringify(data, null, 2));
 
+    // Gestion des erreurs OpenAI
     if (data.error) {
+      console.error("⚠️ Erreur OpenAI:", data.error);
       return res.status(500).json({ error: data.error.message });
     }
 
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error("⚠️ Réponse OpenAI inattendue:", data);
+      return res.status(500).json({ error: "Réponse OpenAI inattendue" });
+    }
+
     res.json({ reply: data.choices[0].message.content });
+
   } catch (err) {
-    console.error("Erreur serveur:", err);
+    console.error("💥 Erreur serveur:", err);
     res.status(500).json({ error: err.message });
   }
 });
